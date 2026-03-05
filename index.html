@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRISM: Demystifying Retention and Interaction in Mid-Training</title>
+  <meta name="description" content="PRISM: A comprehensive empirical study of mid-training design choices for LLMs across 7 models, 4 families, 2 architectures, and scales from 3B to 24B." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Academicons + Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Chart.js for interactive donut -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --c-bg: #f8f9fc;
+      --c-surface: #ffffff; 
+      --c-text: #1a1a2e;
+      --c-text-secondary: #4a4a6a;
+      --c-accent: #0d7377;
+      --c-accent-light: #14919b;
+      --c-accent-bg: #e8f6f7;
+      --c-border: #e2e4ea;
+      --c-highlight: #ff6b35;
+      --c-gradient-start: #0d7377;
+      --c-gradient-end: #14919b;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+      --radius: 12px;
+      --max-w: 1080px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; height: 56px;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.15rem; color: var(--c-accent); text-decoration: none; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+    .nav-ibm-logo { height: 100px; opacity: 0.7; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { font-size: 0.85rem; font-weight: 500; color: var(--c-text-secondary); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--c-accent); }
+
+    /* ── Hero ── */
+    .hero { max-width: var(--max-w); margin: 0 auto; padding: 64px 24px 48px; text-align: center; }
+    .hero-badge {
+      display: inline-block; background: var(--c-accent-bg); color: var(--c-accent);
+      font-weight: 600; font-size: 0.8rem; padding: 6px 16px; border-radius: 20px;
+      margin-bottom: 20px; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .hero h1 { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 8px; }
+    .hero h1 span { color: var(--c-accent); }
+    .hero-subtitle { font-size: clamp(1rem, 2vw, 1.2rem); color: var(--c-text-secondary); max-width: 720px; margin: 0 auto 24px; font-weight: 400; line-height: 1.6; }
+    .hero-authors {
+      font-size: 1.15rem; color: var(--c-text); margin-bottom: 8px; font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+    .hero-authors .author-name {
+      display: inline-block; position: relative;
+    }
+    .hero-authors .author-name:hover { color: var(--c-accent); }
+    .hero-affiliation {
+      font-size: 0.92rem; color: var(--c-text-secondary); margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .ibm-logo-inline {
+      height: 60px; vertical-align: middle; opacity: 0.8;
+    }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px;
+      border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;
+      transition: all 0.2s; border: 1.5px solid transparent;
+    }
+    .btn-primary { background: var(--c-accent); color: #fff; }
+    .btn-primary:hover { background: var(--c-accent-light); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .btn-outline { background: var(--c-surface); color: var(--c-text); border-color: var(--c-border); }
+    .btn-outline:hover { border-color: var(--c-accent); color: var(--c-accent); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+
+    /* ── Hero Figure ── */
+    .hero-figure { max-width: 920px; margin: 0 auto; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--c-border); background: var(--c-surface); }
+    .hero-figure img { width: 100%; display: block; }
+    .hero-figure-caption { font-size: 0.82rem; color: var(--c-text-secondary); padding: 12px 20px; background: #fafbfd; border-top: 1px solid var(--c-border); text-align: left; }
+
+    /* ── Section ── */
+    section { max-width: var(--max-w); margin: 0 auto; padding: 56px 24px; }
+    .section-label { font-size: 0.75rem; font-weight: 700; color: var(--c-accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+    section h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.5px; }
+    section h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
+    .section-desc { font-size: 1rem; color: var(--c-text-secondary); max-width: 700px; margin-bottom: 36px; line-height: 1.7; }
+
+    /* ── Abstract ── */
+    .abstract-box {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius);
+      padding: 32px 36px; box-shadow: var(--shadow-sm); font-size: 0.95rem; line-height: 1.8;
+      max-width: 860px; margin: 0 auto;
+    }
+
+    /* ── Stats Grid ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 16px; }
+    .stat-card {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius);
+      padding: 28px 24px; text-align: center; box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .stat-number {
+      font-size: 2.2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--c-gradient-start), var(--c-gradient-end));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1.2; margin-bottom: 6px;
+    }
+    .stat-label { font-size: 0.85rem; color: var(--c-text-secondary); font-weight: 500; }
+    .stat-detail { font-size: 0.75rem; color: var(--c-text-secondary); margin-top: 4px; opacity: 0.8; }
+
+    /* ── Findings ── */
+    .findings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .finding-card {
+      background: var(--c-surface); border: 1px solid var(--c-border);
+      border-left: 4px solid var(--c-accent); border-radius: 4px var(--radius) var(--radius) 4px;
+      padding: 24px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .finding-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .finding-card .finding-num { font-size: 0.7rem; font-weight: 700; color: var(--c-accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+    .finding-card h3 { font-size: 1.02rem; line-height: 1.4; margin-bottom: 8px; }
+    .finding-card p { font-size: 0.88rem; color: var(--c-text-secondary); line-height: 1.6; }
+    .finding-highlight {
+      display: inline-block; background: var(--c-accent-bg); color: var(--c-accent);
+      font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      padding: 2px 8px; border-radius: 4px;
+    }
+
+    /* ── Results Table ── */
+    .table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--c-border); box-shadow: var(--shadow-sm); background: var(--c-surface); margin-bottom: 16px; }
+    .results-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .results-table thead { background: #f1f3f8; }
+    .results-table th { padding: 14px 16px; text-align: center; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--c-text-secondary); border-bottom: 2px solid var(--c-border); white-space: nowrap; }
+    .results-table th:first-child { text-align: left; }
+    .results-table td { padding: 12px 16px; text-align: center; border-bottom: 1px solid #f0f1f4; white-space: nowrap; }
+    .results-table td:first-child { text-align: left; font-weight: 600; }
+    .results-table tbody tr:hover { background: #f8f9fc; }
+    .results-table .row-highlight { background: var(--c-accent-bg) !important; font-weight: 600; }
+    .results-table .best { color: var(--c-accent); font-weight: 700; }
+    .table-caption { font-size: 0.82rem; color: var(--c-text-secondary); padding: 12px 16px; text-align: left; border-top: 1px solid var(--c-border); background: #fafbfd; }
+
+    /* ── Pipeline ── */
+    .pipeline { display: flex; align-items: center; justify-content: center; gap: 0; margin: 32px auto; flex-wrap: wrap; max-width: 860px; }
+    .pipeline-step {
+      background: var(--c-surface); border: 2px solid var(--c-border); border-radius: var(--radius);
+      padding: 20px 28px; text-align: center; flex: 1; min-width: 180px; max-width: 240px;
+      transition: all 0.2s;
+    }
+    .pipeline-step:hover { border-color: var(--c-accent); box-shadow: var(--shadow-md); }
+    .pipeline-step.active { border-color: var(--c-accent); background: var(--c-accent-bg); }
+    .pipeline-step .step-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .pipeline-step .step-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+    .pipeline-step .step-detail { font-size: 0.75rem; color: var(--c-text-secondary); }
+    .pipeline-arrow { font-size: 1.4rem; color: var(--c-accent); padding: 0 4px; flex-shrink: 0; }
+
+    /* ── Scope Grid ── */
+    .scope-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 32px 0; }
+    .scope-item { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius); padding: 20px; text-align: center; box-shadow: var(--shadow-sm); }
+    .scope-item .scope-val { font-size: 1.6rem; font-weight: 800; color: var(--c-accent); margin-bottom: 4px; }
+    .scope-item .scope-label { font-size: 0.82rem; color: var(--c-text-secondary); font-weight: 500; }
+
+    /* ── Figure Card ── */
+    .figure-card {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .figure-card img { width: 100%; display: block; }
+    .figure-card .fig-caption { padding: 14px 18px; font-size: 0.85rem; color: var(--c-text-secondary); border-top: 1px solid var(--c-border); background: #fafbfd; }
+    .figure-card .fig-caption strong { color: var(--c-text); }
+
+    /* ── Interactive Donut Chart ── */
+    .donut-section { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap; }
+    .donut-controls { flex: 0 0 280px; }
+    .donut-chart-area { flex: 1; min-width: 320px; max-width: 480px; }
+    .mix-btn {
+      display: block; width: 100%; text-align: left; padding: 14px 18px; margin-bottom: 10px;
+      border: 2px solid var(--c-border); border-radius: 10px; background: var(--c-surface);
+      cursor: pointer; transition: all 0.25s; font-family: inherit;
+    }
+    .mix-btn:hover { border-color: var(--c-accent-light); box-shadow: var(--shadow-sm); }
+    .mix-btn.active { border-color: var(--c-accent); background: var(--c-accent-bg); box-shadow: var(--shadow-md); }
+    .mix-btn .mix-title { font-size: 0.92rem; font-weight: 700; color: var(--c-text); margin-bottom: 2px; }
+    .mix-btn .mix-desc { font-size: 0.78rem; color: var(--c-text-secondary); }
+    .donut-legend {
+      display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; justify-content: center;
+    }
+    .donut-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--c-text-secondary); }
+    .donut-legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .donut-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;
+    }
+    .donut-stat {
+      background: #f8f9fc; border-radius: 8px; padding: 12px 14px; text-align: center;
+    }
+    .donut-stat .ds-val { font-size: 1.3rem; font-weight: 800; color: var(--c-accent); }
+    .donut-stat .ds-label { font-size: 0.72rem; color: var(--c-text-secondary); font-weight: 500; }
+
+    /* ── Long-Context Flow ── */
+    .lc-flow-container {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius);
+      padding: 32px; box-shadow: var(--shadow-sm);
+    }
+    .lc-stages {
+      display: flex; align-items: center; justify-content: center; gap: 0;
+      margin: 24px 0; flex-wrap: wrap;
+    }
+    .lc-stage {
+      text-align: center; padding: 16px 20px; border-radius: 10px;
+      min-width: 140px; transition: all 0.2s;
+    }
+    .lc-stage-score {
+      font-size: 2rem; font-weight: 800; line-height: 1.1;
+    }
+    .lc-stage-score.good { color: #0d7377; }
+    .lc-stage-score.bad { color: #e74c3c; }
+    .lc-stage-score.recovered { color: #f39c12; }
+    .lc-stage-label { font-size: 0.78rem; color: var(--c-text-secondary); font-weight: 500; margin-top: 4px; }
+    .lc-stage-sublabel { font-size: 0.7rem; color: var(--c-text-secondary); opacity: 0.7; }
+    .lc-arrow { font-size: 1.3rem; color: var(--c-border); padding: 0 6px; flex-shrink: 0; }
+    .lc-figure { margin-top: 24px; }
+    .lc-figure img { width: 100%; max-width: 800px; margin: 0 auto; display: block; border-radius: 8px; }
+
+    /* ── RL Comparison ── */
+    .rl-compare {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    .rl-compare-card {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .rl-compare-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .rl-compare-card .rl-card-header {
+      padding: 14px 18px; font-weight: 700; font-size: 0.88rem;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .rl-compare-card .rl-card-header.prism-header { background: var(--c-accent-bg); color: var(--c-accent); }
+    .rl-compare-card .rl-card-header.base-header { background: #fef3f2; color: #c0392b; }
+    .rl-compare-card img { width: 100%; display: block; }
+    .rl-compare-card .rl-card-caption {
+      padding: 12px 18px; font-size: 0.82rem; color: var(--c-text-secondary);
+      border-top: 1px solid var(--c-border); background: #fafbfd;
+    }
+    .rl-tab-row {
+      display: flex; gap: 8px; margin-bottom: 20px;
+    }
+    .rl-tab {
+      padding: 8px 20px; border-radius: 8px; border: 1.5px solid var(--c-border);
+      background: var(--c-surface); cursor: pointer; font-family: inherit;
+      font-size: 0.85rem; font-weight: 600; color: var(--c-text-secondary);
+      transition: all 0.2s;
+    }
+    .rl-tab:hover { border-color: var(--c-accent-light); }
+    .rl-tab.active { border-color: var(--c-accent); background: var(--c-accent-bg); color: var(--c-accent); }
+    .rl-panel { display: none; }
+    .rl-panel.active { display: block; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--c-border); max-width: var(--max-w); margin: 0 auto; }
+
+    /* ── Footer ── */
+    footer { max-width: var(--max-w); margin: 0 auto; padding: 40px 24px; text-align: center; font-size: 0.82rem; color: var(--c-text-secondary); }
+    footer a { color: var(--c-accent); text-decoration: none; }
+
+    /* ── BibTeX ── */
+    .bibtex-box {
+      background: #1a1a2e; color: #c8d6e5; border-radius: var(--radius); padding: 24px 28px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.6;
+      overflow-x: auto; position: relative; max-width: 700px; margin: 0 auto;
+    }
+    .bibtex-box .copy-btn {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(255,255,255,0.1); color: #c8d6e5;
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
+      padding: 5px 12px; font-size: 0.72rem; cursor: pointer;
+      font-family: 'Inter', sans-serif; font-weight: 500; transition: all 0.2s;
+    }
+    .bibtex-box .copy-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero { padding: 40px 16px 32px; }
+      .hero h1 { font-size: 1.8rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .findings-grid { grid-template-columns: 1fr; }
+      .pipeline { flex-direction: column; gap: 8px; }
+      .pipeline-arrow { transform: rotate(90deg); }
+      .nav-links { gap: 14px; }
+      .nav-links a { font-size: 0.78rem; }
+      .scope-grid { grid-template-columns: repeat(2, 1fr); }
+      .donut-section { flex-direction: column; }
+      .donut-controls { flex: 1; width: 100%; }
+      .rl-compare { grid-template-columns: 1fr; }
+      .lc-stages { flex-direction: column; gap: 4px; }
+      .lc-arrow { transform: rotate(90deg); }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .btn-row { flex-direction: column; align-items: center; }
+      .scope-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navigation ─── -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <img class="nav-ibm-logo" src="assets/ibm_logo.png" alt="IBM" />
+        PRISM
+      </a>
+      <div class="nav-links">
+        <a href="#abstract">Abstract</a>
+        <a href="#findings">Findings</a>
+        <a href="#data-mixtures">Data</a>
+        <a href="#results">Results</a>
+        <a href="#rl-curves">RL</a>
+        <a href="#long-context">Long-Context</a>
+        <a href="#citation">Cite</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ─── -->
+  <section class="hero">
+    <div class="hero-badge">ArXiv Preprint 2025</div>
+    <h1><span>PRISM</span>: Demystifying Retention and<br>Interaction in Mid-Training</h1>
+    <p class="hero-subtitle">
+      A comprehensive empirical study of mid-training design choices for LLMs across
+      4 model families, 2 architecture types, 7 models, and scales from 3B to 24B parameters.
+    </p>
+    <p class="hero-authors">
+      <span class="author-name">Bharat Runwal</span> &nbsp;&middot;&nbsp;
+      <span class="author-name">Ashish Agrawal</span> &nbsp;&middot;&nbsp;
+      <span class="author-name">Anurag Roy</span> &nbsp;&middot;&nbsp;
+      <span class="author-name">Rameswar Panda</span>
+    </p>
+    <p class="hero-affiliation">
+      <img class="ibm-logo-inline" src="assets/ibm_logo.png" alt="IBM" />
+      IBM Research
+    </p>
+    <div class="btn-row">
+      <a href="#" class="btn btn-primary">
+        <i class="ai ai-arxiv"></i> ArXiv Paper
+      </a>
+      <a href="#" class="btn btn-outline">
+        <i class="fab fa-github"></i> Code
+      </a>
+      <a href="#" class="btn btn-outline">
+        <i class="fas fa-database"></i> Data Mixtures
+      </a>
+      <a href="#" class="btn btn-outline">
+        <i class="fas fa-robot"></i> Models
+      </a>
+    </div>
+
+    <div class="hero-figure">
+      <img src="assets/web_fig.gif" alt="PRISM animated overview showing mid-training pipeline and results across model families" />
+      <div class="hero-figure-caption">
+        <strong>PRISM overview.</strong> Mid-training decisions are decomposed into their principal design axes: data composition, timing, domain interaction, benchmark selection, RL compatibility, and scaling behavior. PRISM enables holistic evaluation of mid-training choices across model families at scale.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Experimental Scope ─── -->
+  <section>
+    <div class="section-label">Experimental Scope</div>
+    <h2>Scale of the Study</h2>
+    <p class="section-desc">
+      PRISM systematically evaluates mid-training across a diverse set of modern LLMs, spanning multiple families, architectures, and parameter scales.
+    </p>
+    <div class="scope-grid">
+      <div class="scope-item"><div class="scope-val">7</div><div class="scope-label">Base Models</div></div>
+      <div class="scope-item"><div class="scope-val">4</div><div class="scope-label">Model Families</div></div>
+      <div class="scope-item"><div class="scope-val">2</div><div class="scope-label">Architecture Types</div></div>
+      <div class="scope-item"><div class="scope-val">3B-24B</div><div class="scope-label">Parameter Scale</div></div>
+      <div class="scope-item"><div class="scope-val">~27B</div><div class="scope-label">Mid-Train Tokens</div></div>
+      <div class="scope-item"><div class="scope-val">10+</div><div class="scope-label">Benchmarks</div></div>
+    </div>
+    <div style="margin-top:24px;">
+      <div class="table-wrapper">
+        <table class="results-table">
+          <thead><tr><th>Model Family</th><th>Models</th><th>Architecture</th><th>Parameters</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2">Granite</td><td>Granite-3.3-8B, Granite-4 Micro (3B), Granite-4 Dense (8B)</td><td>Dense Transformer</td><td>3B, 8B</td></tr>
+            <tr><td style="font-weight:normal; text-align:center;">Granite-4-H Micro (3B)</td><td>Attention-Mamba Hybrid</td><td>3B</td></tr>
+            <tr><td>LLaMA</td><td>LLaMA-3.1-8B</td><td>Dense Transformer</td><td>8B</td></tr>
+            <tr><td>Mistral</td><td>Mistral-7B-v0.3, Mistral-Small-24B</td><td>Dense Transformer</td><td>7B, 24B</td></tr>
+            <tr><td>Nemotron-H</td><td>Nemotron-H-8B</td><td>Attention-Mamba Hybrid</td><td>8B</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Abstract ─── -->
+  <section id="abstract">
+    <div class="section-label">Abstract</div>
+    <h2>Paper Summary</h2>
+    <div class="abstract-box">
+      <p>
+        We present <strong>PRISM</strong> (Demystifying Retention and Interaction in Mid-Training), a comprehensive empirical study of mid-training design choices for large language models. Through controlled experiments across seven open-source base models spanning four families (Granite, LLaMA, Mistral, Nemotron-H), two architecture types (dense Transformer and attention-Mamba hybrid), and scales from 3B to 24B parameters, we systematically investigate <em>what data to use</em>, <em>when to apply mid-training</em>, <em>how it interacts with reinforcement learning (RL)</em>, and <em>whether findings generalize across architectures</em>.
+      </p>
+      <br/>
+      <p>
+        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +30 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
+      </p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Key Numbers ─── -->
+  <section>
+    <div class="section-label">At a Glance</div>
+    <h2>Key Results</h2>
+    <p class="section-desc">PRISM mid-training produces consistent, large gains across domains and model families using only ~27B tokens.</p>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-number">+15-40</div><div class="stat-label">Math Improvement</div><div class="stat-detail">points across all models</div></div>
+      <div class="stat-card"><div class="stat-number">+5-12</div><div class="stat-label">Code Improvement</div><div class="stat-detail">points across all models</div></div>
+      <div class="stat-card"><div class="stat-number">+6-13</div><div class="stat-label">Science Improvement</div><div class="stat-detail">GPQA-Diamond</div></div>
+      <div class="stat-card"><div class="stat-number">3-4x</div><div class="stat-label">Pipeline Boost</div><div class="stat-detail">base &lt;12 to 29-42 AVG</div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Key Findings ─── -->
+  <section id="findings">
+    <div class="section-label">Key Findings</div>
+    <h2>What We Discovered</h2>
+    <p class="section-desc">Five principal findings that provide practical guidance for designing mid-training pipelines.</p>
+    <div class="findings-grid">
+      <div class="finding-card">
+        <div class="finding-num">Finding 1</div>
+        <h3>Mid-training is a powerful reasoning catalyst</h3>
+        <p>Across all tested models, PRISM yields <span class="finding-highlight">+15 to +40 pt</span> math gains, <span class="finding-highlight">+5 to +12 pt</span> code gains, and <span class="finding-highlight">+6 to +13 pt</span> science gains, while preserving general-purpose performance.</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 2</div>
+        <h3>Mid-training is essential for effective RL</h3>
+        <p>The full PRISM &rarr; RL pipeline transforms base models scoring under 12 AVG into models scoring <span class="finding-highlight">29-42 AVG</span>, a 3-4x improvement. RL applied directly to base models is substantially less effective, with AIME scores remaining near zero.</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 3</div>
+        <h3>Data composition matters at MT, not RL</h3>
+        <p>Changing the mid-training mix shifts AVG by <span class="finding-highlight">+4 to +6 pt</span>, while changing the RL mix produces &lt;2 point differences. Science data at mid-training unlocks <span class="finding-highlight">+17 to +30 pt</span> GPQA-Diamond gains during RL.</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 4</div>
+        <h3>Benefits generalize across architectures</h3>
+        <p>Both dense Transformers and attention-Mamba hybrids benefit consistently from PRISM, from 3B to 24B parameters. Mid-training gains are architecture-agnostic.</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 5</div>
+        <h3>RL expands the solvability frontier</h3>
+        <p>RL on PRISM-mid-trained models progressively solves prompts that were initially unsolvable, with training curves that remain non-saturating across hundreds of steps.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Pipeline ─── -->
+  <section id="pipeline">
+    <div class="section-label">Method</div>
+    <h2>The PRISM Pipeline</h2>
+    <p class="section-desc">A three-stage recipe: targeted mid-training with retention-aware data mixtures, optional long-context restoration, then reinforcement learning.</p>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-icon"><i class="fas fa-brain"></i></div>
+        <div class="step-name">Base Model</div>
+        <div class="step-detail">Pre-trained LLM<br/>(3B-24B params)</div>
+      </div>
+      <div class="pipeline-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="pipeline-step active">
+        <div class="step-icon"><i class="fas fa-layer-group"></i></div>
+        <div class="step-name">PRISM Mid-Training</div>
+        <div class="step-detail">~27B tokens<br/>Math + Code + Science</div>
+      </div>
+      <div class="pipeline-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="pipeline-step">
+        <div class="step-icon"><i class="fas fa-expand-arrows-alt"></i></div>
+        <div class="step-name">LC Restoration</div>
+        <div class="step-detail">Linear merging +<br/>128k extension</div>
+      </div>
+      <div class="pipeline-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="pipeline-step">
+        <div class="step-icon"><i class="fas fa-trophy"></i></div>
+        <div class="step-name">RL (GRPO)</div>
+        <div class="step-detail">Math + Code + Science<br/>verifiable rewards</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Data Mixtures (Interactive) ─── -->
+  <section id="data-mixtures">
+    <div class="section-label">Data Composition</div>
+    <h2>Mid-Training Data Mixtures</h2>
+    <p class="section-desc">
+      We design three progressively richer data mixtures. Click each configuration to explore how domain coverage evolves and see corresponding benchmark performance.
+    </p>
+
+    <div class="donut-section">
+      <!-- Left: Controls + Stats -->
+      <div class="donut-controls">
+        <button class="mix-btn active" onclick="switchMix('math')" id="btn-math">
+          <div class="mix-title">Math Only</div>
+          <div class="mix-desc">75% Math, 15% General (DCLM-EDU), 10% Chat</div>
+        </button>
+        <button class="mix-btn" onclick="switchMix('mathcode')" id="btn-mathcode">
+          <div class="mix-title">Math + Code</div>
+          <div class="mix-desc">47.5% Math, 42.5% Code, 5% General, 5% Chat</div>
+        </button>
+        <button class="mix-btn" onclick="switchMix('mcs')" id="btn-mcs">
+          <div class="mix-title">Math + Code + Science</div>
+          <div class="mix-desc">37% Math, 40.5% Code, 12.5% Science, 5% General, 5% Chat</div>
+        </button>
+
+        <div class="donut-stats" id="donut-stats">
+          <div class="donut-stat"><div class="ds-val" id="ds-math">36.4</div><div class="ds-label">Math AVG</div></div>
+          <div class="donut-stat"><div class="ds-val" id="ds-code">2.8</div><div class="ds-label">Code AVG</div></div>
+          <div class="donut-stat"><div class="ds-val" id="ds-science">17.3</div><div class="ds-label">GPQA-D</div></div>
+          <div class="donut-stat"><div class="ds-val" id="ds-avg">18.9</div><div class="ds-label">Overall AVG</div></div>
+        </div>
+      </div>
+
+      <!-- Right: Chart -->
+      <div class="donut-chart-area">
+        <div style="position:relative; max-width:420px; margin:0 auto;">
+          <canvas id="donutChart" width="420" height="420"></canvas>
+        </div>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+    </div>
+
+    <!-- Domain comparison table -->
+    <div style="margin-top:36px;">
+      <div class="table-wrapper">
+        <table class="results-table">
+          <thead><tr><th>Mid-Training Mix</th><th>Code AVG</th><th>GPQA-D</th><th>Math AVG</th><th>Overall AVG</th></tr></thead>
+          <tbody>
+            <tr><td>Base (no MT)</td><td>2.07</td><td>22.56</td><td>8.95</td><td>11.19</td></tr>
+            <tr><td>Math only</td><td>2.81</td><td>17.34</td><td>36.43</td><td>18.86</td></tr>
+            <tr><td>Math + Code</td><td><span class="best">10.71</span></td><td>19.02</td><td>44.33</td><td>24.69</td></tr>
+            <tr class="row-highlight"><td>Math + Code + Science</td><td>10.58</td><td><span class="best">29.12</span></td><td><span class="best">48.75</span></td><td><span class="best">29.48</span></td></tr>
+          </tbody>
+        </table>
+        <div class="table-caption"><strong>Domain-specific mid-training results on Granite-3.3-8B.</strong> Adding science data yields +10 points on GPQA-Diamond and +4 points on math, with minimal code regression. This composition effect persists and amplifies through RL.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Full Pipeline Results ─── -->
+  <section id="results">
+    <div class="section-label">Results</div>
+    <h2>Full Pipeline Evaluation</h2>
+    <p class="section-desc">End-to-end results: base model &rarr; PRISM mid-training &rarr; RL. AVG is the macro-average over Math, Code, and Science.</p>
+
+    <div class="table-wrapper">
+      <table class="results-table">
+        <thead><tr><th>Model</th><th>Stage</th><th>AIME'24</th><th>AIME'25</th><th>MATH500</th><th>LCB</th><th>CF</th><th>GPQA-D</th><th>AVG</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3">Granite-3.3-8B</td><td>Base</td><td>0.46</td><td>0.31</td><td>26.09</td><td>2.15</td><td>1.99</td><td>22.56</td><td>8.93</td></tr>
+          <tr><td>+ PRISM</td><td>37.18</td><td>27.96</td><td>81.11</td><td>10.63</td><td>10.52</td><td>29.12</td><td>32.75</td></tr>
+          <tr class="row-highlight"><td>+ PRISM + RL</td><td class="best">53.56</td><td class="best">37.50</td><td class="best">89.40</td><td class="best">19.95</td><td class="best">16.52</td><td class="best">46.97</td><td class="best">43.98</td></tr>
+
+          <tr><td rowspan="3">LLaMA-3.1-8B</td><td>Base</td><td>2.01</td><td>1.54</td><td>44.80</td><td>5.11</td><td>4.27</td><td>27.27</td><td>14.17</td></tr>
+          <tr><td>+ PRISM</td><td>22.08</td><td>14.71</td><td>72.94</td><td>10.51</td><td>9.21</td><td>30.81</td><td>26.71</td></tr>
+          <tr class="row-highlight"><td>+ PRISM + RL</td><td class="best">37.83</td><td class="best">26.04</td><td class="best">83.60</td><td class="best">16.43</td><td class="best">14.43</td><td class="best">41.92</td><td class="best">36.71</td></tr>
+
+          <tr><td rowspan="3">Mistral-Small-24B</td><td>Base</td><td>6.88</td><td>4.79</td><td>57.40</td><td>7.93</td><td>6.30</td><td>31.31</td><td>19.10</td></tr>
+          <tr><td>+ PRISM</td><td>35.71</td><td>26.04</td><td>82.20</td><td>17.11</td><td>12.54</td><td>39.39</td><td>35.50</td></tr>
+          <tr class="row-highlight"><td>+ PRISM + RL</td><td class="best">47.92</td><td class="best">36.46</td><td class="best">87.20</td><td class="best">22.89</td><td class="best">18.40</td><td class="best">49.49</td><td class="best">43.73</td></tr>
+
+          <tr><td rowspan="3">Nemotron-H-8B</td><td>Base</td><td>3.13</td><td>2.29</td><td>54.00</td><td>9.80</td><td>5.62</td><td>29.29</td><td>17.36</td></tr>
+          <tr><td>+ PRISM</td><td>25.83</td><td>17.50</td><td>78.00</td><td>14.07</td><td>10.85</td><td>35.35</td><td>30.27</td></tr>
+          <tr class="row-highlight"><td>+ PRISM + RL</td><td class="best">40.63</td><td class="best">27.71</td><td class="best">85.40</td><td class="best">18.65</td><td class="best">15.22</td><td class="best">45.45</td><td class="best">38.84</td></tr>
+        </tbody>
+      </table>
+      <div class="table-caption"><strong>Full pipeline results (PRISM &rarr; RL).</strong> All models use Math+Code+Science mid-training. AVG is the macro-average across all six benchmarks. Highlighted rows show the complete pipeline. Representative models shown; see paper for all seven.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── RL Learning Curves ─── -->
+  <section id="rl-curves">
+    <div class="section-label">Reinforcement Learning</div>
+    <h2>Why Mid-Training Before RL?</h2>
+    <p class="section-desc">
+      RL on PRISM-mid-trained models produces large, sustained gains across math, code, and science. RL on base models without mid-training is substantially less effective, with AIME scores remaining near zero.
+    </p>
+
+    <!-- Tabs: Math / Code -->
+    <div class="rl-tab-row">
+      <button class="rl-tab active" onclick="switchRL('math')">Math Benchmarks</button>
+      <button class="rl-tab" onclick="switchRL('code')">Code + Science</button>
+    </div>
+
+    <!-- Math panel -->
+    <div class="rl-panel active" id="rl-panel-math">
+      <div class="rl-compare">
+        <div class="rl-compare-card">
+          <div class="rl-card-header prism-header"><i class="fas fa-check-circle"></i> &nbsp;Base &rarr; PRISM &rarr; RL</div>
+          <img src="assets/rl_math_prism.png" alt="RL learning curves on PRISM mid-trained Granite-3.3-8B for math benchmarks" />
+          <div class="rl-card-caption">AIME'24 reaches <strong>41+</strong>, AIME'25 reaches <strong>32+</strong>, MATH500 reaches <strong>85+</strong>. Strong gains with non-saturating curves.</div>
+        </div>
+        <div class="rl-compare-card">
+          <div class="rl-card-header base-header"><i class="fas fa-times-circle"></i> &nbsp;Base &rarr; RL (no mid-training)</div>
+          <img src="assets/rl_math_base.png" alt="RL learning curves on base Granite-3.3-8B for math benchmarks" />
+          <div class="rl-card-caption">AIME'24 stays below <strong>1.5</strong>, AIME'25 below <strong>0.6</strong>. RL alone cannot bootstrap reasoning from a base model.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code panel -->
+    <div class="rl-panel" id="rl-panel-code">
+      <div class="rl-compare">
+        <div class="rl-compare-card">
+          <div class="rl-card-header prism-header"><i class="fas fa-check-circle"></i> &nbsp;Base &rarr; PRISM &rarr; RL</div>
+          <img src="assets/rl_code_prism.png" alt="RL learning curves on PRISM mid-trained Granite-3.3-8B for code and science" />
+          <div class="rl-card-caption">LiveCodeBench reaches <strong>19+</strong>, Codeforces <strong>20+</strong>, GPQA-Diamond <strong>47+</strong>. Science gains are especially large when science data was included at mid-training.</div>
+        </div>
+        <div class="rl-compare-card">
+          <div class="rl-card-header base-header"><i class="fas fa-times-circle"></i> &nbsp;Base &rarr; RL (no mid-training)</div>
+          <img src="assets/rl_code_base.png" alt="RL learning curves on base Granite-3.3-8B for code and science" />
+          <div class="rl-card-caption">Without mid-training foundation, RL produces minimal code/science gains. Base model lacks the reasoning substrate to leverage RL signal.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Long-Context Restoration ─── -->
+  <section id="long-context">
+    <div class="section-label">Long-Context</div>
+    <h2>Restoring Long-Context Ability</h2>
+    <p class="section-desc">
+      Mid-training at 8k context degrades long-context capabilities. We restore them via linear model merging followed by a brief 128k extension phase.
+    </p>
+
+    <div class="lc-flow-container">
+      <div class="lc-stages">
+        <div class="lc-stage">
+          <div class="lc-stage-score good">59.1</div>
+          <div class="lc-stage-label">Base Model</div>
+          <div class="lc-stage-sublabel">RULER Score</div>
+        </div>
+        <div class="lc-arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="lc-stage">
+          <div class="lc-stage-score bad">6.5</div>
+          <div class="lc-stage-label">After 8k Mid-Training</div>
+          <div class="lc-stage-sublabel">89% drop</div>
+        </div>
+        <div class="lc-arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="lc-stage">
+          <div class="lc-stage-score recovered">30.4</div>
+          <div class="lc-stage-label">Linear Merge</div>
+          <div class="lc-stage-sublabel">Partial recovery</div>
+        </div>
+        <div class="lc-arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="lc-stage">
+          <div class="lc-stage-score good">42.2</div>
+          <div class="lc-stage-label">+ 128k Extension</div>
+          <div class="lc-stage-sublabel">71% recovered</div>
+        </div>
+      </div>
+
+      <div class="lc-figure">
+        <img src="assets/merge_lc_flow.png" alt="Long-context restoration pipeline: base model, mid-training, Linear merge, 128k extension" />
+      </div>
+
+      <div style="margin-top:20px; font-size:0.88rem; color:var(--c-text-secondary); line-height:1.7; max-width:800px; margin-left:auto; margin-right:auto;">
+        <strong style="color:var(--c-text);">How it works:</strong> After mid-training at 8k context, we merge the mid-trained model with the original base model. This recovers a significant portion of long-context ability while retaining reasoning gains. A brief additional training phase on 128k sequences further restores the RULER score from 30.4 to 42.2, recovering 71% of the original capability.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Citation ─── -->
+  <section id="citation">
+    <div class="section-label">Citation</div>
+    <h2>BibTeX</h2>
+    <p class="section-desc">If you find PRISM useful in your research, please consider citing our paper.</p>
+    <div class="bibtex-box">
+      <button class="copy-btn" onclick="copyBibtex()">Copy</button>
+      <pre><code>@article{runwal2025prism,
+  title={{PRISM}: Demystifying Retention and
+         Interaction in Mid-Training},
+  author={Runwal, Bharat and Agrawal, Ashish
+          and Roy, Anurag and Panda, Rameswar},
+  journal={arXiv preprint},
+  year={2025}
+}</code></pre>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Footer ─── -->
+  <footer>
+    <p>PRISM: Demystifying Retention and Interaction in Mid-Training &nbsp;|&nbsp; <a href="#">ArXiv</a> &nbsp;|&nbsp; <a href="#">GitHub</a></p>
+    <p style="margin-top:8px; opacity:0.6;">&copy; 2025 IBM Research. This page template is for academic use.</p>
+  </footer>
+
+  <!-- ─── Scripts ─── -->
+  <script>
+    // ═══ Interactive Donut Chart ═══
+    // Colors matched to the original paper figure (midtrain_mixtures_combined.png)
+    const SRC_COLORS = {
+      'DCLM-EDU':                        '#F5A623', // orange
+      'Combined Chat Data':              '#E74C3C', // red
+      'Nemotron-Post-Train-v1: Math':    '#1ABC9C', // teal
+      'Open-R1 (MoT): Math':            '#2ECC71', // green
+      'Megamath Web Pro':                '#3498DB', // blue
+      'Open-R1 (MoT): Code':            '#27AE60', // dark green
+      'OpenCodeReasoning-2':             '#9B59B6', // purple
+      'RefinCode':                       '#E67E22', // dark orange
+      'StarCoder2':                      '#34495E', // dark blue-gray
+      'OpenThoughts3: Science':          '#8E44AD', // dark purple
+      'Open-R1 (MoT): Science':         '#D35400', // brown-orange
+    };
+    const DOMAIN_COLORS = {
+      'General': '#E67E22',
+      'Math':    '#16A085',
+      'Code':    '#2980B9',
+      'Science': '#8E44AD',
+    };
+
+    const mixtures = {
+      math: {
+        // From Excel: DCLM-EDU 15, Chat 10, Nemotron-PT-v1:Math 10, Open-R1(MoT):Math 10, Megamath 55
+        outerLabels: ['DCLM-EDU', 'Combined Chat Data', 'Nemotron-Post-Train-v1: Math', 'Open-R1 (MoT): Math', 'Megamath Web Pro'],
+        outerData:   [15, 10, 10, 10, 55],
+        innerLabels: ['General', 'Math'],
+        innerData:   [25, 75],
+        stats: { math: '36.4', code: '2.8', science: '17.3', avg: '18.9' }
+      },
+      mathcode: {
+        // From Excel: DCLM-EDU 5, Chat 5, Nemotron-PT-v1:Math 10, Open-R1(MoT):Math 10, Megamath 27.5, Open-R1(MoT):Code 5, OCR-2 10, RefinCode 13.75, StarCoder2 13.75
+        outerLabels: ['DCLM-EDU', 'Combined Chat Data', 'Nemotron-Post-Train-v1: Math', 'Open-R1 (MoT): Math', 'Megamath Web Pro', 'Open-R1 (MoT): Code', 'OpenCodeReasoning-2', 'RefinCode', 'StarCoder2'],
+        outerData:   [5, 5, 10, 10, 27.5, 5, 10, 13.75, 13.75],
+        innerLabels: ['General', 'Math', 'Code'],
+        innerData:   [10, 47.5, 42.5],
+        stats: { math: '44.3', code: '10.7', science: '19.0', avg: '24.7' }
+      },
+      mcs: {
+        // From Excel: DCLM-EDU 5, Chat 5, Nemotron-PT-v1:Math 10, Open-R1(MoT):Math 7, Megamath 20, Open-R1(MoT):Code 3, OCR-2 10, RefinCode 13.75, StarCoder2 13.75, OpenThoughts3 7.75, Open-R1(MoT):Science 4.75
+        outerLabels: ['DCLM-EDU', 'Combined Chat Data', 'Nemotron-Post-Train-v1: Math', 'Open-R1 (MoT): Math', 'Megamath Web Pro', 'Open-R1 (MoT): Code', 'OpenCodeReasoning-2', 'RefinCode', 'StarCoder2', 'OpenThoughts3: Science', 'Open-R1 (MoT): Science'],
+        outerData:   [5, 5, 10, 7, 20, 3, 10, 13.75, 13.75, 7.75, 4.75],
+        innerLabels: ['General', 'Math', 'Code', 'Science'],
+        innerData:   [10, 37, 40.5, 12.5],
+        stats: { math: '48.8', code: '10.6', science: '29.1', avg: '29.5' }
+      }
+    };
+
+    let currentMix = 'math';
+    let donutChart = null;
+
+    function buildLegend(mix) {
+      const el = document.getElementById('donut-legend');
+      el.innerHTML = mix.outerLabels.map((l, i) => {
+        const c = SRC_COLORS[l] || '#999';
+        return `<div class="donut-legend-item"><div class="donut-legend-swatch" style="background:${c}"></div>${l}</div>`;
+      }).join('');
+    }
+
+    function switchMix(key) {
+      currentMix = key;
+      document.querySelectorAll('.mix-btn').forEach(b => b.classList.remove('active'));
+      if (key === 'math') document.getElementById('btn-math').classList.add('active');
+      else if (key === 'mathcode') document.getElementById('btn-mathcode').classList.add('active');
+      else document.getElementById('btn-mcs').classList.add('active');
+
+      const mix = mixtures[key];
+      const outerColors = mix.outerLabels.map(l => SRC_COLORS[l] || '#999');
+      const innerColors = mix.innerLabels.map(l => DOMAIN_COLORS[l] || '#999');
+
+      // Update stats
+      document.getElementById('ds-math').textContent = mix.stats.math;
+      document.getElementById('ds-code').textContent = mix.stats.code;
+      document.getElementById('ds-science').textContent = mix.stats.science;
+      document.getElementById('ds-avg').textContent = mix.stats.avg;
+
+      // Update chart - use dummy global labels, rely on custom tooltip for correct names
+      if (donutChart) donutChart.destroy();
+      const ctx = document.getElementById('donutChart').getContext('2d');
+
+      // Pad arrays so inner and outer have equal length (Chart.js requirement for shared labels)
+      const maxLen = Math.max(mix.innerLabels.length, mix.outerLabels.length);
+      const padInner = (arr, fill) => [...arr, ...Array(maxLen - arr.length).fill(fill)];
+
+      donutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: Array.from({length: maxLen}, (_, i) => ''), // empty global labels
+          datasets: [
+            {
+              label: 'Domain',
+              data: padInner(mix.innerData, 0),
+              backgroundColor: padInner(innerColors, 'transparent'),
+              borderWidth: 2,
+              borderColor: padInner(Array(mix.innerData.length).fill('#fff'), 'transparent'),
+              weight: 1,
+            },
+            {
+              label: 'Source',
+              data: padInner(mix.outerData, 0),
+              backgroundColor: padInner(outerColors, 'transparent'),
+              borderWidth: 2,
+              borderColor: padInner(Array(mix.outerData.length).fill('#fff'), 'transparent'),
+              weight: 2,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          cutout: '30%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              filter: function(item) {
+                return item.raw > 0; // hide padding slices
+              },
+              callbacks: {
+                label: function(ctx) {
+                  const dsIdx = ctx.datasetIndex;
+                  const idx = ctx.dataIndex;
+                  if (dsIdx === 0) {
+                    // Inner ring
+                    return mix.innerLabels[idx] + ': ' + mix.innerData[idx] + '%';
+                  } else {
+                    // Outer ring
+                    return mix.outerLabels[idx] + ': ' + mix.outerData[idx] + '%';
+                  }
+                }
+              }
+            }
+          },
+          animation: { animateRotate: true, duration: 600 }
+        }
+      });
+      buildLegend(mix);
+    }
+
+    // Initialize chart on load
+    window.addEventListener('DOMContentLoaded', () => switchMix('math'));
+
+    // ═══ RL Tab Switching ═══
+    function switchRL(tab) {
+      document.querySelectorAll('.rl-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.rl-panel').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('rl-panel-' + tab).classList.add('active');
+    }
+
+    // ═══ Copy BibTeX ═══
+    function copyBibtex() {
+      const text = document.querySelector('.bibtex-box code').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      });
+    }
+  </script>
+</body>
+</html>
