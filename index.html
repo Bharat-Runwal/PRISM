@@ -135,7 +135,7 @@
     .stat-number {
       font-size: 2.2rem; font-weight: 800;
       background: linear-gradient(135deg, var(--c-gradient-start), var(--c-gradient-end));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; background-clip: text;
       line-height: 1.2; margin-bottom: 6px;
     }
     .stat-label { font-size: 0.85rem; color: var(--c-text-secondary); font-weight: 500; }
@@ -308,6 +308,114 @@
     }
     .bibtex-box .copy-btn:hover { background: rgba(255,255,255,0.2); }
 
+    /* ── Analysis Section ── */
+    .analysis-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+      max-width: 960px; margin: 0 auto 40px;
+    }
+    .analysis-card {
+      background: var(--c-surface); border-radius: var(--radius);
+      border: 1px solid var(--c-border); padding: 28px;
+      box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .analysis-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .analysis-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; color: var(--c-text); }
+    .analysis-card p { font-size: 0.88rem; color: var(--c-text-secondary); line-height: 1.65; }
+    .analysis-card .ac-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; margin-bottom: 14px; color: #fff;
+    }
+
+    .weight-compare {
+      max-width: 960px; margin: 0 auto 40px;
+      background: var(--c-surface); border-radius: var(--radius);
+      border: 1px solid var(--c-border); padding: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .weight-compare h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; text-align: center;
+    }
+    .weight-compare .wc-subtitle {
+      font-size: 0.85rem; color: var(--c-text-secondary); text-align: center; margin-bottom: 24px;
+    }
+    .wc-model-row {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
+    }
+    .wc-model-label {
+      width: 140px; font-size: 0.82rem; font-weight: 600; color: var(--c-text); text-align: right; flex-shrink: 0;
+    }
+    .wc-bars {
+      flex: 1; display: flex; gap: 6px; align-items: center;
+    }
+    .wc-bar {
+      height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 10px; font-size: 0.72rem; font-weight: 700; color: #fff;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+      min-width: 0;
+    }
+    .wc-bar-label {
+      font-size: 0.72rem; font-weight: 600; color: var(--c-text-secondary); min-width: 40px;
+    }
+    .wc-legend {
+      display: flex; justify-content: center; gap: 20px; margin-top: 16px; margin-bottom: 8px;
+    }
+    .wc-legend-item {
+      display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--c-text-secondary);
+    }
+    .wc-legend-dot {
+      width: 12px; height: 12px; border-radius: 3px;
+    }
+    .wc-section-title {
+      font-size: 0.82rem; font-weight: 600; color: var(--c-accent); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 14px; margin-top: 8px;
+    }
+    .wc-divider {
+      border: none; border-top: 1px dashed var(--c-border); margin: 20px 0;
+    }
+
+    .pass-rate-table {
+      max-width: 800px; margin: 0 auto 40px;
+      background: var(--c-surface); border-radius: var(--radius);
+      border: 1px solid var(--c-border); overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .pass-rate-table table {
+      width: 100%; border-collapse: collapse; font-size: 0.88rem;
+    }
+    .pass-rate-table th {
+      background: linear-gradient(135deg, var(--c-gradient-start), var(--c-gradient-end));
+      color: #fff; padding: 12px 16px; text-align: center; font-weight: 600; font-size: 0.82rem;
+    }
+    .pass-rate-table td {
+      padding: 10px 16px; text-align: center; border-bottom: 1px solid var(--c-border);
+    }
+    .pass-rate-table tr:last-child td { border-bottom: none; }
+    .pass-rate-table tr:hover td { background: var(--c-accent-bg); }
+    .pass-rate-table .pr-model { text-align: left; font-weight: 600; }
+    .pass-rate-table .pr-best { font-weight: 800; color: var(--c-accent); }
+    .pass-rate-table .pr-bar-cell { position: relative; }
+    .pr-bar-bg {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: var(--c-accent-bg); border-radius: 0 4px 4px 0;
+      transition: width 1s ease;
+    }
+    .pr-bar-val { position: relative; z-index: 1; }
+    .analysis-insight-bar {
+      max-width: 960px; margin: 0 auto 40px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .ai-stat {
+      background: var(--c-surface); border-radius: var(--radius);
+      border: 1px solid var(--c-border); padding: 24px 20px;
+      text-align: center; box-shadow: var(--shadow-sm);
+    }
+    .ai-stat .ai-num {
+      font-size: 2rem; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--c-gradient-start), var(--c-accent-light));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .ai-stat .ai-label { font-size: 0.82rem; color: var(--c-text-secondary); margin-top: 4px; font-weight: 500; }
+
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .hero { padding: 40px 16px 32px; }
@@ -324,6 +432,10 @@
       .rl-compare { grid-template-columns: 1fr; }
       .lc-stages { flex-direction: column; gap: 4px; }
       .lc-arrow { transform: rotate(90deg); }
+      .analysis-grid { grid-template-columns: 1fr; }
+      .analysis-insight-bar { grid-template-columns: 1fr; }
+      .wc-model-row { flex-direction: column; align-items: flex-start; }
+      .wc-model-label { width: auto; text-align: left; }
     }
     @media (max-width: 480px) {
       .stats-grid { grid-template-columns: 1fr; }
@@ -348,6 +460,7 @@
         <a href="#results">Results</a>
         <a href="#rl-curves">RL</a>
         <a href="#long-context">Long-Context</a>
+        <a href="#analysis">Analysis</a>
         <a href="#citation">Cite</a>
       </div>
     </div>
@@ -370,6 +483,9 @@
     <p class="hero-affiliation">
       <img class="ibm-logo-inline" src="assets/ibm_logo.png" alt="IBM" />
       IBM Research
+      &nbsp;&middot;&nbsp;
+      <img class="ibm-logo-inline" src="assets/mit-ibm.png" alt="MIT-IBM Watson AI Lab" style="height:45px" />
+      
     </p>
     <div class="btn-row">
       <a href="#" class="btn btn-primary">
@@ -684,27 +800,27 @@
     <div class="lc-flow-container">
       <div class="lc-stages">
         <div class="lc-stage">
-          <div class="lc-stage-score good">59.1</div>
+          <div class="lc-stage-score good">59.09</div>
           <div class="lc-stage-label">Base Model</div>
           <div class="lc-stage-sublabel">RULER Score</div>
         </div>
         <div class="lc-arrow"><i class="fas fa-arrow-right"></i></div>
         <div class="lc-stage">
-          <div class="lc-stage-score bad">6.5</div>
+          <div class="lc-stage-score bad">6.46</div>
           <div class="lc-stage-label">After 8k Mid-Training</div>
-          <div class="lc-stage-sublabel">89% drop</div>
+          <div class="lc-stage-sublabel">89.06% drop</div>
         </div>
         <div class="lc-arrow"><i class="fas fa-arrow-right"></i></div>
         <div class="lc-stage">
-          <div class="lc-stage-score recovered">30.4</div>
+          <div class="lc-stage-score recovered">11.32</div>
           <div class="lc-stage-label">Linear Merge</div>
           <div class="lc-stage-sublabel">Partial recovery</div>
         </div>
         <div class="lc-arrow"><i class="fas fa-arrow-right"></i></div>
         <div class="lc-stage">
-          <div class="lc-stage-score good">42.2</div>
+          <div class="lc-stage-score good">42.16</div>
           <div class="lc-stage-label">+ 128k Extension</div>
-          <div class="lc-stage-sublabel">71% recovered</div>
+          <div class="lc-stage-sublabel"> change recovered</div>
         </div>
       </div>
 
@@ -714,6 +830,205 @@
 
       <div style="margin-top:20px; font-size:0.88rem; color:var(--c-text-secondary); line-height:1.7; max-width:800px; margin-left:auto; margin-right:auto;">
         <strong style="color:var(--c-text);">How it works:</strong> After mid-training at 8k context, we merge the mid-trained model with the original base model. This recovers a significant portion of long-context ability while retaining reasoning gains. A brief additional training phase on 128k sequences further restores the RULER score from 30.4 to 42.2, recovering 71% of the original capability.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Mechanistic Analysis ─── -->
+  <section id="analysis">
+    <div class="section-label">Mechanistic Analysis</div>
+    <h2>How Do Mid-Training and RL Differ?</h2>
+    <p class="section-desc">
+      We investigate <em>how</em> mid-training and RL change models through weight-level divergence, prediction entropy, and correctness analysis across three 8B models.
+    </p>
+
+    <!-- Top-line stats -->
+    <div class="analysis-insight-bar">
+      <div class="ai-stat">
+        <div class="ai-num">&gt;97%</div>
+        <div class="ai-label">Parameters changed by mid-training</div>
+      </div>
+      <div class="ai-stat">
+        <div class="ai-num">~5%</div>
+        <div class="ai-label">Parameters changed by RL</div>
+      </div>
+      <div class="ai-stat">
+        <div class="ai-num">300-580x</div>
+        <div class="ai-label">Magnitude difference (MT vs RL)</div>
+      </div>
+    </div>
+
+    <!-- Weight divergence animated bars -->
+    <div class="weight-compare">
+      <h3>Weight Divergence: Dense Restructuring vs. Sparse Refinement</h3>
+      <p class="wc-subtitle">Normalized L2 divergence by component type. Mid-training changes weights orders of magnitude more than RL.</p>
+
+      <div class="wc-legend">
+        <div class="wc-legend-item"><div class="wc-legend-dot" style="background:#2563EB"></div> Base &rarr; Mid-Train</div>
+        <div class="wc-legend-item"><div class="wc-legend-dot" style="background:#DC2626"></div> Mid-Train &rarr; RL</div>
+        <div class="wc-legend-item"><div class="wc-legend-dot" style="background:#EA580C"></div> Base &rarr; RL (no MT)</div>
+      </div>
+
+      <div class="wc-section-title">Granite-3.3 (8B) &mdash; Dense Transformer</div>
+
+      <div class="wc-model-row">
+        <div class="wc-model-label">Attention</div>
+        <div class="wc-bars">
+          <div class="wc-bar" data-width="88" style="background:#2563EB; width:0">0.175</div>
+          <div class="wc-bar" data-width="2" style="background:#DC2626; width:0; font-size:0; min-width:6px" title="0.0003"></div>
+          <div class="wc-bar" data-width="2" style="background:#EA580C; width:0; font-size:0; min-width:6px" title="0.0004"></div>
+        </div>
+      </div>
+      <div class="wc-model-row">
+        <div class="wc-model-label">MLP</div>
+        <div class="wc-bars">
+          <div class="wc-bar" data-width="100" style="background:#2563EB; width:0">0.329</div>
+          <div class="wc-bar" data-width="2" style="background:#DC2626; width:0; font-size:0; min-width:6px" title="0.0006"></div>
+          <div class="wc-bar" data-width="2" style="background:#EA580C; width:0; font-size:0; min-width:6px" title="0.0007"></div>
+        </div>
+      </div>
+
+      <hr class="wc-divider">
+      <div class="wc-section-title">Nemotron-H (8B) &mdash; Attention-Mamba Hybrid</div>
+
+      <div class="wc-model-row">
+        <div class="wc-model-label">Attention</div>
+        <div class="wc-bars">
+          <div class="wc-bar" data-width="80" style="background:#2563EB; width:0">0.230</div>
+          <div class="wc-bar" data-width="2" style="background:#DC2626; width:0; font-size:0; min-width:6px" title="0.0007"></div>
+          <div class="wc-bar" data-width="2" style="background:#EA580C; width:0; font-size:0; min-width:6px" title="0.0006"></div>
+        </div>
+      </div>
+      <div class="wc-model-row">
+        <div class="wc-model-label">MLP</div>
+        <div class="wc-bars">
+          <div class="wc-bar" data-width="100" style="background:#2563EB; width:0">0.289</div>
+          <div class="wc-bar" data-width="2" style="background:#DC2626; width:0; font-size:0; min-width:6px" title="0.0007"></div>
+          <div class="wc-bar" data-width="2" style="background:#EA580C; width:0; font-size:0; min-width:6px" title="0.0006"></div>
+        </div>
+      </div>
+      <div class="wc-model-row">
+        <div class="wc-model-label">Mamba</div>
+        <div class="wc-bars">
+          <div class="wc-bar" data-width="48" style="background:#2563EB; width:0">0.138</div>
+          <div class="wc-bar" data-width="2" style="background:#DC2626; width:0; font-size:0; min-width:6px" title="0.0003"></div>
+          <div class="wc-bar" data-width="2" style="background:#EA580C; width:0; font-size:0; min-width:6px" title="0.0003"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; font-size:0.82rem; color:var(--c-text-secondary); text-align:center; line-height:1.6;">
+        RL produces <strong>identical weight changes</strong> whether or not mid-training preceded it, yet only succeeds when applied to mid-trained models.
+      </div>
+    </div>
+
+    <!-- Correctness pass rate table -->
+    <div class="pass-rate-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left">Model</th>
+            <th>Stage</th>
+            <th>Pass Rate</th>
+            <th>Med. Length</th>
+            <th>Neg Log-Prob</th>
+            <th>Corr. NLP</th>
+            <th>Incorr. NLP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="pr-model" rowspan="3">Granite-3.3<br><span style="font-weight:400;font-size:0.78rem;color:var(--c-text-secondary)">(8B)</span></td>
+            <td>Base</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:14%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">9.5%</span></td>
+            <td>444</td><td>0.237</td><td>0.203</td><td>0.240</td>
+          </tr>
+          <tr>
+            <td>MT</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:56%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">37.0%</span></td>
+            <td>4,364</td><td>0.153</td><td>0.141</td><td>0.159</td>
+          </tr>
+          <tr>
+            <td>RL</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">66.5%</span></td>
+            <td>2,902</td><td>0.156</td><td>0.143</td><td>0.181</td>
+          </tr>
+
+          <tr><td colspan="7" style="height:4px; padding:0; border:none; background:var(--c-border)"></td></tr>
+
+          <tr>
+            <td class="pr-model" rowspan="3">LLaMA-3.1<br><span style="font-weight:400;font-size:0.78rem;color:var(--c-text-secondary)">(8B)</span></td>
+            <td>Base</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:1.5%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">0.5%</span></td>
+            <td>10</td><td>0.706</td><td>&mdash;</td><td>0.708</td>
+          </tr>
+          <tr>
+            <td>MT</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:67%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">21.0%</span></td>
+            <td>1,029</td><td>0.387</td><td>0.164</td><td>0.447</td>
+          </tr>
+          <tr>
+            <td>RL</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">31.5%</span></td>
+            <td>1,666</td><td>0.336</td><td>0.164</td><td>0.415</td>
+          </tr>
+
+          <tr><td colspan="7" style="height:4px; padding:0; border:none; background:var(--c-border)"></td></tr>
+
+          <tr>
+            <td class="pr-model" rowspan="3">Nemotron-H<br><span style="font-weight:400;font-size:0.78rem;color:var(--c-text-secondary)">(8B, Hybrid)</span></td>
+            <td>Base</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:69%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">35.5%</span></td>
+            <td>580</td><td>0.203</td><td>0.050</td><td>0.287</td>
+          </tr>
+          <tr>
+            <td>MT</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:62%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">32.0%</span></td>
+            <td>2,186</td><td>0.238</td><td>0.134</td><td>0.287</td>
+          </tr>
+          <tr>
+            <td>RL</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">51.5%</span></td>
+            <td>2,514</td><td>0.183</td><td>0.125</td><td>0.244</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding:12px 16px; font-size:0.78rem; color:var(--c-text-secondary); line-height:1.5; border-top:1px solid var(--c-border);">
+        <strong>Setup:</strong> 200 math prompts, 8k context (512 prompt + 7680 generation tokens), temperature 0.6, top-p 0.95, scored with the same math verifier used during RL training.
+        Correct responses consistently have <em>lower</em> negative log-probability (higher confidence) than incorrect ones.
+      </div>
+    </div>
+
+    <!-- Insight cards -->
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="ac-icon" style="background: linear-gradient(135deg, #2563EB, #3B82F6);">
+          <i class="fas fa-brain"></i>
+        </div>
+        <h3>Mid-training teaches reasoning, not just answers</h3>
+        <p>Response lengths increase dramatically: LLaMA goes from <strong>10 tokens</strong> to <strong>1,029 tokens</strong> (100x). Models learn multi-step problem decomposition with extended reasoning chains.</p>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-icon" style="background: linear-gradient(135deg, #DC2626, #EF4444);">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <h3>RL refines toward efficient correctness</h3>
+        <p>RL adjusts response length model-dependently: shortening Granite-3.3 (4,364 &rarr; 2,902) while extending LLaMA (1,029 &rarr; 1,666), optimizing both quality and efficiency.</p>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-icon" style="background: linear-gradient(135deg, #059669, #10B981);">
+          <i class="fas fa-arrows-alt"></i>
+        </div>
+        <h3>Data composition changes direction, not magnitude</h3>
+        <p>MC and MCS mid-training produce <strong>identical weight changes</strong> (L2: 0.177 vs 0.175), yet MCS+RL achieves GPQA-Diamond of 52.9 vs only 35.5 for MC+RL.</p>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-icon" style="background: linear-gradient(135deg, #7C3AED, #8B5CF6);">
+          <i class="fas fa-layer-group"></i>
+        </div>
+        <h3>Architecture-agnostic RL sparsity</h3>
+        <p>All three component types in Nemotron-H show nearly identical RL sparsity: Attention (93.5%), MLP (94.5%), and Mamba (93.9%). The sparse pattern is universal.</p>
       </div>
     </div>
   </section>
@@ -906,6 +1221,23 @@
         setTimeout(() => btn.textContent = 'Copy', 2000);
       });
     }
+
+    // ═══ Weight Divergence Bar Animation ═══
+    const wcObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const bars = entry.target.querySelectorAll('.wc-bar');
+          bars.forEach((bar, i) => {
+            setTimeout(() => {
+              bar.style.width = bar.dataset.width + '%';
+            }, i * 60);
+          });
+          wcObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    const wcEl = document.querySelector('.weight-compare');
+    if (wcEl) wcObserver.observe(wcEl);
   </script>
 </body>
 </html>
