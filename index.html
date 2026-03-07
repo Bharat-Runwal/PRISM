@@ -535,7 +535,7 @@
             <tr><td rowspan="2">Granite</td><td>Granite-3.3-8B, Granite-4 Micro (3B), Granite-4 Dense (8B)</td><td>Dense Transformer</td><td>3B, 8B</td></tr>
             <tr><td style="font-weight:normal; text-align:center;">Granite-4-H Micro (3B)</td><td>Attention-Mamba Hybrid</td><td>3B</td></tr>
             <tr><td>LLaMA</td><td>LLaMA-3.1-8B</td><td>Dense Transformer</td><td>8B</td></tr>
-            <tr><td>Mistral</td><td>Mistral-7B-v0.3, Mistral-Small-24B</td><td>Dense Transformer</td><td>7B, 24B</td></tr>
+            <tr><td>Mistral</td><td>Mistral-7B-v0.1, Mistral-Small-24B</td><td>Dense Transformer</td><td>7B, 24B</td></tr>
             <tr><td>Nemotron-H</td><td>Nemotron-H-8B</td><td>Attention-Mamba Hybrid</td><td>8B</td></tr>
           </tbody>
         </table>
@@ -555,7 +555,7 @@
       </p>
       <br/>
       <p>
-        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +30 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Mechanistically, mid-training densely restructures &gt;97% of weights while RL makes sparse, front-loaded refinements to ~5% of parameters. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
+        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +30 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Mechanistically, mid-training densely restructures &gt;90% of weights while RL makes sparse, front-loaded refinements to ~5% of parameters. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
       </p>
     </div>
   </section>
@@ -847,7 +847,7 @@
     <!-- Top-line stats -->
     <div class="analysis-insight-bar">
       <div class="ai-stat">
-        <div class="ai-num">&gt;97%</div>
+        <div class="ai-num">&gt;90%</div>
         <div class="ai-label">Parameters changed by mid-training</div>
       </div>
       <div class="ai-stat">
