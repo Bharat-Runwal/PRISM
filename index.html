@@ -49,6 +49,10 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    .author-name {
+      text-decoration: none;
+      color: inherit;
+    }
     /* ── Navigation ── */
     nav {
       position: sticky; top: 0; z-index: 100;
@@ -433,7 +437,7 @@
       .lc-stages { flex-direction: column; gap: 4px; }
       .lc-arrow { transform: rotate(90deg); }
       .analysis-grid { grid-template-columns: 1fr; }
-      .analysis-insight-bar { grid-template-columns: 1fr; }
+      .analysis-insight-bar { grid-template-columns: 1fr !important; }
       .wc-model-row { flex-direction: column; align-items: flex-start; }
       .wc-model-label { width: auto; text-align: left; }
     }
@@ -450,7 +454,7 @@
   <nav>
     <div class="nav-inner">
       <a href="#" class="nav-logo">
-        <img class="nav-ibm-logo" src="assets/ibm_logo.png" alt="IBM" />
+        <!-- <img class="nav-ibm-logo" src="assets/ibm_logo.png" alt="IBM" /> -->
         PRISM
       </a>
       <div class="nav-links">
@@ -475,10 +479,13 @@
       4 model families, 2 architecture types, 7 models, and scales from 3B to 24B parameters.
     </p>
     <p class="hero-authors">
-      <span class="author-name">Bharat Runwal</span> &nbsp;&middot;&nbsp;
-      <span class="author-name">Ashish Agrawal</span> &nbsp;&middot;&nbsp;
-      <span class="author-name">Anurag Roy</span> &nbsp;&middot;&nbsp;
-      <span class="author-name">Rameswar Panda</span>
+    <a href="http://bharat-runwal.github.io" target="_blank" class="author-name">Bharat Runwal</a> &nbsp;&middot;&nbsp;
+
+    <a href="https://www.linkedin.com/in/ashish-agrawal-784a53115/" target="_blank" class="author-name">Ashish Agrawal</a> &nbsp;&middot;&nbsp;
+
+    <a href="https://www.linkedin.com/in/ranurag/?originalSubdomain=in" target="_blank" class="author-name">Anurag Roy</a> &nbsp;&middot;&nbsp;
+
+    <a href="https://rpand002.github.io" target="_blank" class="author-name">Rameswar Panda</a>
     </p>
     <p class="hero-affiliation">
       <img class="ibm-logo-inline" src="assets/ibm_logo.png" alt="IBM" />
@@ -494,11 +501,15 @@
       <a href="#" class="btn btn-outline">
         <i class="fab fa-github"></i> Code
       </a>
-      <a href="#" class="btn btn-outline">
-        <i class="fas fa-database"></i> Data Mixtures
+
+      <a href="https://huggingface.co/PRISM-Midtraining/datasets" class="btn btn-outline">
+        <img src="assets/huggingface-icon.png" style="height:1.35em;vertical-align:-0.15em;margin-right:2px;">
+        Data Mixtures
       </a>
-      <a href="#" class="btn btn-outline">
-        <i class="fas fa-robot"></i> Models
+
+      <a href="https://huggingface.co/PRISM-Midtraining/models" class="btn btn-outline">
+        <img src="assets/huggingface-icon.png" style="height:1.35em;vertical-align:-0.15em;margin-right:2px;">
+        Models
       </a>
     </div>
 
@@ -555,7 +566,7 @@
       </p>
       <br/>
       <p>
-        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +30 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Mechanistically, mid-training densely restructures &gt;90% of weights while RL makes sparse, front-loaded refinements to ~5% of parameters. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
+        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +28 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Mechanistically, mid-training densely restructures &gt;90% of weights while RL makes sparse, front-loaded refinements to ~5% of parameters. Representational geometry is largely preserved through RL (CKA &gt;0.998 across models and input distributions), while different mid-training data mixtures produce same-magnitude but differently-directed weight updates (cosine similarity 0.52 for Granite-3.3, 0.62 for Nemotron-H). Pass rate landscape interpolation shows a generally increasing pass rate from Base (15%) to Mid-Training (72%) to RL (74-80%) for Granite-3.3, consistent with mid-training progressively improving the model's configuration for RL. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
       </p>
     </div>
   </section>
@@ -596,17 +607,22 @@
       <div class="finding-card">
         <div class="finding-num">Finding 3</div>
         <h3>Data composition matters at MT, not RL</h3>
-        <p>Changing the mid-training mix shifts AVG by <span class="finding-highlight">+4 to +6 pt</span>, while changing the RL mix produces &lt;2 point differences. Science data at mid-training unlocks <span class="finding-highlight">+17 to +30 pt</span> GPQA-Diamond gains during RL.</p>
+        <p>Changing the mid-training mix shifts AVG by <span class="finding-highlight">+4 to +6 pt</span>, while changing the RL mix produces &lt;2 point differences. Science data at mid-training unlocks <span class="finding-highlight">+17 to +28 pt</span> GPQA-Diamond gains during RL.</p>
       </div>
       <div class="finding-card">
         <div class="finding-num">Finding 4</div>
         <h3>Benefits generalize across architectures</h3>
-        <p>Both dense Transformers and attention-Mamba hybrids benefit consistently from PRISM, from 3B to 24B parameters. Mid-training gains are architecture-agnostic.</p>
+        <p>Both dense Transformers and attention-Mamba hybrids benefit consistently from PRISM, from 3B to 24B parameters. Mid-training gains are consistent across all four model families tested.</p>
       </div>
       <div class="finding-card">
         <div class="finding-num">Finding 5</div>
         <h3>RL expands the solvability frontier</h3>
-        <p>RL on PRISM-mid-trained models progressively solves prompts that were initially unsolvable, with training curves that remain non-saturating across hundreds of steps.</p>
+        <p>For Granite-3.3, RL on PRISM-mid-trained models progressively solves prompts that were initially unsolvable, with training curves that remain non-saturating across hundreds of steps.</p>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 6</div>
+        <h3>Mid-training is the key RL prerequisite, confirmed geometrically</h3>
+        <p>CKA analysis shows RL preserves mid-training representations (CKA <span class="finding-highlight">&gt;0.998</span>). Pass rate landscape on held-out MATH500 shows a generally increasing path from Base (<span class="finding-highlight">15%</span>) to MT (<span class="finding-highlight">72%</span>) to RL (<span class="finding-highlight">74-80%</span>) for Granite-3.3, consistent with mid-training improving the configuration for RL.</p>
       </div>
     </div>
   </section>
@@ -841,11 +857,11 @@
     <div class="section-label">Mechanistic Analysis</div>
     <h2>How Do Mid-Training and RL Differ?</h2>
     <p class="section-desc">
-      We investigate <em>how</em> mid-training and RL change models through weight-level divergence, prediction entropy, and correctness analysis across three 8B models.
+      We investigate <em>how</em> mid-training and RL change models through weight-level divergence, CKA representation analysis, weight direction comparisons, pass rate landscape interpolation, prediction entropy, and correctness analysis across three 8B models.
     </p>
 
     <!-- Top-line stats -->
-    <div class="analysis-insight-bar">
+    <div class="analysis-insight-bar" style="grid-template-columns: repeat(5, 1fr);">
       <div class="ai-stat">
         <div class="ai-num">&gt;90%</div>
         <div class="ai-label">Parameters changed by mid-training</div>
@@ -857,6 +873,14 @@
       <div class="ai-stat">
         <div class="ai-num">300-580x</div>
         <div class="ai-label">Magnitude difference (MT vs RL)</div>
+      </div>
+      <div class="ai-stat">
+        <div class="ai-num">&gt;0.998</div>
+        <div class="ai-label">CKA preserved through RL</div>
+      </div>
+      <div class="ai-stat">
+        <div class="ai-num">15%&rarr;72%&rarr;74%</div>
+        <div class="ai-label">Pass rate: Base&rarr;MT&rarr;RL (MATH500)</div>
       </div>
     </div>
 
@@ -923,6 +947,103 @@
       </div>
     </div>
 
+    <!-- CKA Representation Analysis -->
+    <div class="weight-compare" style="margin-top:32px;">
+      <h3>CKA Representation Analysis: RL Preserves Mid-Training Geometry</h3>
+      <p class="wc-subtitle">Centered Kernel Alignment (CKA) between mid-trained and RL model representations across inputs and models. Values &gt;0.998 indicate that RL refines without restructuring representations.</p>
+      <div class="figure-card" style="max-width:860px; margin:0 auto 20px;">
+        <img src="assets/cka_paper.jpg" alt="CKA representation analysis across 4 models and 3 input distributions" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <div style="display:none; padding:60px 20px; text-align:center; color:var(--c-text-secondary); font-size:0.9rem; background:#f8f9fc;">
+          <i class="fas fa-image" style="font-size:2rem; margin-bottom:12px; display:block; opacity:0.4;"></i>
+          Figure: CKA analysis (PDF format, view in paper)
+        </div>
+        <div class="fig-caption">
+          <strong>CKA similarity between mid-trained and RL checkpoints</strong> on Wikipedia, C4, and GSM8K inputs for Granite-3.3, LLaMA-3.1, Granite-4H, and Nemotron-H. RL consistently preserves the representational geometry established by mid-training (CKA &gt;0.998 for G33, LLaMA, G4H). Nemotron-H shows architecture-specific effects in early Mamba layers (CKA ~0.1 on general text), yet perplexity is unchanged (11.49 vs 11.52), indicating a layer-type-specific reorganization without functional degradation.
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:860px; margin:0 auto;">
+        <div style="background:#f8f9fc; border-radius:10px; padding:18px; border:1px solid var(--c-border);">
+          <div style="font-size:0.78rem; font-weight:700; color:var(--c-accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Dense Transformers (G33, LLaMA, G4H)</div>
+          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">CKA &gt;0.999 across all layers and all three input distributions (Wikipedia, C4, GSM8K). Mid-training's representational geometry is fully preserved through RL regardless of data domain.</div>
+        </div>
+        <div style="background:#f8f9fc; border-radius:10px; padding:18px; border:1px solid var(--c-border);">
+          <div style="font-size:0.78rem; font-weight:700; color:#7C3AED; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Attention-Mamba Hybrid (Nemotron-H)</div>
+          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">Early Mamba layers (7-16) show low CKA (~0.1) on general text after RL, but perplexity is unchanged. This architecture-specific reorganization does not occur in the Granite-4H hybrid, pointing to model-specific RL dynamics.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weight Direction Analysis -->
+    <div class="weight-compare" style="margin-top:32px;">
+      <h3>Weight Direction Analysis: Same Magnitude, Different Direction</h3>
+      <p class="wc-subtitle">MC and MCS mid-training produce identical weight change magnitudes but different directions, explaining why data composition decisions at mid-training determine RL outcomes.</p>
+      <div class="figure-card" style="max-width:860px; margin:0 auto 20px;">
+        <img src="assets/weight_direction_paper.jpg" alt="Weight direction analysis comparing MC and MCS mid-training" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <div style="display:none; padding:60px 20px; text-align:center; color:var(--c-text-secondary); font-size:0.9rem; background:#f8f9fc;">
+          <i class="fas fa-image" style="font-size:2rem; margin-bottom:12px; display:block; opacity:0.4;"></i>
+          Figure: Weight direction analysis (PDF format, view in paper)
+        </div>
+        <div class="fig-caption">
+          <strong>Weight direction comparison between Math+Code (MC) and Math+Code+Science (MCS) mid-training.</strong> Both mixtures produce nearly identical L2 magnitudes (0.177 vs 0.175) but diverge in direction: cosine similarity of 0.52 for Granite-3.3 and 0.62 for Nemotron-H. This directional divergence, not magnitude, accounts for the large downstream difference in GPQA-Diamond performance after RL (+17 pts).
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; max-width:860px; margin:0 auto;">
+        <div style="background:var(--c-accent-bg); border-radius:10px; padding:16px; text-align:center; border:1px solid rgba(13,115,119,0.2);">
+          <div style="font-size:1.6rem; font-weight:800; color:var(--c-accent); margin-bottom:4px;">0.177 / 0.175</div>
+          <div style="font-size:0.78rem; color:var(--c-text-secondary);">MC vs MCS L2 magnitude<br>(Granite-3.3, nearly identical)</div>
+        </div>
+        <div style="background:#fef3f2; border-radius:10px; padding:16px; text-align:center; border:1px solid rgba(220,38,38,0.15);">
+          <div style="font-size:1.6rem; font-weight:800; color:#DC2626; margin-bottom:4px;">0.52 / 0.62</div>
+          <div style="font-size:0.78rem; color:var(--c-text-secondary);">MC vs MCS cosine similarity<br>(G33 / Nemotron-H directions)</div>
+        </div>
+        <div style="background:#f0fdf4; border-radius:10px; padding:16px; text-align:center; border:1px solid rgba(5,150,105,0.2);">
+          <div style="font-size:1.6rem; font-weight:800; color:#059669; margin-bottom:4px;">+17 pt</div>
+          <div style="font-size:0.78rem; color:var(--c-text-secondary);">GPQA-Diamond gain<br>from directional difference</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pass Rate Landscape -->
+    <div class="weight-compare" style="margin-top:32px;">
+      <h3>Pass Rate Landscape Along the Training Path</h3>
+      <p class="wc-subtitle">Interpolating model weights along the Base &rarr; MT &rarr; RL training path reveals a generally increasing pass rate along the training path, consistent with mid-training progressively improving the model's configuration for subsequent RL.</p>
+      <div class="figure-card" style="max-width:860px; margin:0 auto 20px;">
+        <img src="assets/reward_landscape_paper.jpg" alt="Pass rate landscape interpolation along Base to MT to RL path" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <div style="display:none; padding:60px 20px; text-align:center; color:var(--c-text-secondary); font-size:0.9rem; background:#f8f9fc;">
+          <i class="fas fa-image" style="font-size:2rem; margin-bottom:12px; display:block; opacity:0.4;"></i>
+          Figure: Pass rate landscape (PDF format, view in paper)
+        </div>
+        <div class="fig-caption">
+          <strong>Pass rate landscape on held-out MATH500 (Granite-3.3 &amp; LLaMA-3.1).</strong> Left panels: pass rate increases generally from Base to MT to RL (G33: 15%&rarr;72%&rarr;74%; LLaMA: 1.5%&rarr;44%&rarr;65%). Right: 2D landscape for Granite-3.3 centered at MT, showing the RL direction as consistently high-reward.
+        </div>
+      </div>
+      <!-- 2D Landscape Animation GIF -->
+      <div style="max-width:600px; margin:24px auto 20px; text-align:center;">
+        <img src="assets/reward_landscape_animation_2d.gif"
+             alt="2D Pass Rate Landscape Animation — dot moves from Base to MT to RL"
+             style="width:100%; border-radius:12px; box-shadow:var(--shadow-md);" />
+        <p style="font-size:0.82rem; color:var(--c-text-secondary); margin-top:10px; line-height:1.5;">
+          <strong>Animation:</strong> Dot moves from Base &rarr; MT &rarr; RL on the 2D pass rate landscape.
+          The dashed white isoline and colorbar indicator track the current pass rate level.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; max-width:860px; margin:0 auto;">
+        <div style="background:#f8f9fc; border-radius:10px; padding:16px; text-align:center; border:1px solid var(--c-border);">
+          <div style="font-size:1.5rem; font-weight:800; color:var(--c-text-secondary); margin-bottom:4px;">7%</div>
+          <div style="font-size:0.78rem; color:var(--c-text-secondary); font-weight:600;">Base Model<br>Pass Rate</div>
+        </div>
+        <div style="background:var(--c-accent-bg); border-radius:10px; padding:16px; text-align:center; border:1px solid rgba(13,115,119,0.2);">
+          <div style="font-size:1.5rem; font-weight:800; color:var(--c-accent); margin-bottom:4px;">26%</div>
+          <div style="font-size:0.78rem; color:var(--c-text-secondary); font-weight:600;">After Mid-Training<br>Pass Rate</div>
+        </div>
+        <div style="background:#fef3f2; border-radius:10px; padding:16px; text-align:center; border:1px solid rgba(220,38,38,0.15);">
+          <div style="font-size:1.5rem; font-weight:800; color:#DC2626; margin-bottom:4px;">54%</div>
+          <div style="font-size:0.78rem; color:var(--c-text-secondary); font-weight:600;">After RL<br>Pass Rate</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Correctness pass rate table -->
     <div class="pass-rate-table">
       <table>
@@ -941,18 +1062,18 @@
           <tr>
             <td class="pr-model" rowspan="3">Granite-3.3<br><span style="font-weight:400;font-size:0.78rem;color:var(--c-text-secondary)">(8B)</span></td>
             <td>Base</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:14%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">9.5%</span></td>
-            <td>444</td><td>0.237</td><td>0.203</td><td>0.240</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:18%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">14.5%</span></td>
+            <td>124</td><td>0.380</td><td>0.211</td><td>0.409</td>
           </tr>
           <tr>
             <td>MT</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:56%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">37.0%</span></td>
-            <td>4,364</td><td>0.153</td><td>0.141</td><td>0.159</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:96%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">76.0%</span></td>
+            <td>2,196</td><td>0.138</td><td>0.132</td><td>0.159</td>
           </tr>
           <tr>
             <td>RL</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">66.5%</span></td>
-            <td>2,902</td><td>0.156</td><td>0.143</td><td>0.181</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">79.5%</span></td>
+            <td>1,700</td><td>0.142</td><td>0.138</td><td>0.156</td>
           </tr>
 
           <tr><td colspan="7" style="height:4px; padding:0; border:none; background:var(--c-border)"></td></tr>
@@ -960,18 +1081,18 @@
           <tr>
             <td class="pr-model" rowspan="3">LLaMA-3.1<br><span style="font-weight:400;font-size:0.78rem;color:var(--c-text-secondary)">(8B)</span></td>
             <td>Base</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:1.5%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">0.5%</span></td>
-            <td>10</td><td>0.706</td><td>&mdash;</td><td>0.708</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:2%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">1.5%</span></td>
+            <td>174</td><td>0.723</td><td>0.127</td><td>0.732</td>
           </tr>
           <tr>
             <td>MT</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:67%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">21.0%</span></td>
-            <td>1,029</td><td>0.387</td><td>0.164</td><td>0.447</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:64%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">44.0%</span></td>
+            <td>1,158</td><td>0.373</td><td>0.151</td><td>0.547</td>
           </tr>
           <tr>
             <td>RL</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">31.5%</span></td>
-            <td>1,666</td><td>0.336</td><td>0.164</td><td>0.415</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">68.5%</span></td>
+            <td>1,159</td><td>0.284</td><td>0.154</td><td>0.566</td>
           </tr>
 
           <tr><td colspan="7" style="height:4px; padding:0; border:none; background:var(--c-border)"></td></tr>
@@ -979,23 +1100,23 @@
           <tr>
             <td class="pr-model" rowspan="3">Nemotron-H<br><span style="font-weight:400;font-size:0.78rem;color:var(--c-text-secondary)">(8B, Hybrid)</span></td>
             <td>Base</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:69%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">35.5%</span></td>
-            <td>580</td><td>0.203</td><td>0.050</td><td>0.287</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:85%; background:#94A3B8; opacity:0.2"></span><span class="pr-bar-val">67.5%</span></td>
+            <td>433</td><td>0.182</td><td>0.042</td><td>0.473</td>
           </tr>
           <tr>
             <td>MT</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:62%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">32.0%</span></td>
-            <td>2,186</td><td>0.238</td><td>0.134</td><td>0.287</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:81%; background:#2563EB; opacity:0.15"></span><span class="pr-bar-val">64.5%</span></td>
+            <td>1,757</td><td>0.140</td><td>0.120</td><td>0.177</td>
           </tr>
           <tr>
             <td>RL</td>
-            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">51.5%</span></td>
-            <td>2,514</td><td>0.183</td><td>0.125</td><td>0.244</td>
+            <td class="pr-bar-cell"><span class="pr-bar-bg" style="width:100%; background:#DC2626; opacity:0.12"></span><span class="pr-bar-val pr-best">79.5%</span></td>
+            <td>1,683</td><td>0.129</td><td>0.118</td><td>0.170</td>
           </tr>
         </tbody>
       </table>
       <div style="padding:12px 16px; font-size:0.78rem; color:var(--c-text-secondary); line-height:1.5; border-top:1px solid var(--c-border);">
-        <strong>Setup:</strong> 200 math prompts, 8k context (512 prompt + 7680 generation tokens), temperature 0.6, top-p 0.95, scored with the same math verifier used during RL training.
+        <strong>Setup:</strong> 200 held-out MATH500 problems, 7680 generation tokens, temperature 0.6, top-p 0.95, scored with the same math verifier used during RL training.
         Correct responses consistently have <em>lower</em> negative log-probability (higher confidence) than incorrect ones.
       </div>
     </div>
@@ -1021,7 +1142,7 @@
           <i class="fas fa-arrows-alt"></i>
         </div>
         <h3>Data composition changes direction, not magnitude</h3>
-        <p>MC and MCS mid-training produce <strong>identical weight changes</strong> (L2: 0.177 vs 0.175), yet MCS+RL achieves GPQA-Diamond of 52.9 vs only 35.5 for MC+RL.</p>
+        <p>MC and MCS mid-training produce <strong>identical weight changes</strong> (L2: 0.177 vs 0.175), yet MCS+RL achieves GPQA-Diamond of 52.9 vs only 35.5 for MC+RL. Cosine similarity between the two update directions is only 0.52 (G33) and 0.62 (Nemotron-H).</p>
       </div>
       <div class="analysis-card">
         <div class="ac-icon" style="background: linear-gradient(135deg, #7C3AED, #8B5CF6);">
@@ -1036,6 +1157,20 @@
         </div>
         <h3>RL optimization is front-loaded</h3>
         <p>Most weight changes occur in the first <strong>~200-400 steps</strong>, then plateau. The active parameter set grows progressively from ~1.5% to ~5%, and MT vs Base starting points produce identical trajectories.</p>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-icon" style="background: linear-gradient(135deg, #0EA5E9, #38BDF8);">
+          <i class="fas fa-project-diagram"></i>
+        </div>
+        <h3>RL preserves representational geometry</h3>
+        <p>CKA similarity between mid-trained and RL representations exceeds <strong>0.998</strong> across all layers for Granite-3.3, LLaMA, and Granite-4H on Wikipedia, C4, and GSM8K inputs. RL refines rather than restructures the learned representations.</p>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-icon" style="background: linear-gradient(135deg, #DB2777, #EC4899);">
+          <i class="fas fa-mountain"></i>
+        </div>
+        <h3>Pass rate landscape along the training path</h3>
+        <p>Pass rate interpolation on held-out MATH500 shows a generally increasing trend (<strong>15%&rarr;72%&rarr;74%</strong> for G33; <strong>1.5%&rarr;44%&rarr;65%</strong> for LLaMA). The 2D landscape shows the RL direction as consistently high-reward with no apparent sharp barriers.</p>
       </div>
     </div>
   </section>
