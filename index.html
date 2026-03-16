@@ -48,6 +48,11 @@
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
     }
+  
+    .author-name {
+      text-decoration: none;
+      color: inherit;
+    }
 
     /* ── Navigation ── */
     nav {
@@ -475,10 +480,13 @@
       4 model families, 2 architecture types, 7 models, and scales from 3B to 24B parameters.
     </p>
     <p class="hero-authors">
-      <span class="author-name">Bharat Runwal</span> &nbsp;&middot;&nbsp;
-      <span class="author-name">Ashish Agrawal</span> &nbsp;&middot;&nbsp;
-      <span class="author-name">Anurag Roy</span> &nbsp;&middot;&nbsp;
-      <span class="author-name">Rameswar Panda</span>
+      <a href="http://bharat-runwal.github.io" target="_blank" class="author-name">Bharat Runwal</a> &nbsp;&middot;&nbsp;
+
+      <a href="https://www.linkedin.com/in/ashish-agrawal-784a53115/" target="_blank" class="author-name">Ashish Agrawal</a> &nbsp;&middot;&nbsp;
+
+      <a href="https://www.linkedin.com/in/ranurag/?originalSubdomain=in" target="_blank" class="author-name">Anurag Roy</a> &nbsp;&middot;&nbsp;
+
+      <a href="https://rpand002.github.io" target="_blank" class="author-name">Rameswar Panda</a>
     </p>
     <p class="hero-affiliation">
       <img class="ibm-logo-inline" src="assets/ibm_logo.png" alt="IBM" />
@@ -494,13 +502,19 @@
       <a href="#" class="btn btn-outline">
         <i class="fab fa-github"></i> Code
       </a>
-      <a href="#" class="btn btn-outline">
-        <img src="assets/huggingface-icon.png" style="height:1em;vertical-align:-0.15em;margin-right:2px;"> Data Mixtures
+
+     <a href="https://huggingface.co/PRISM-Midtraining/datasets" class="btn btn-outline">
+        <img src="assets/huggingface-icon.png" style="height:1.35em;vertical-align:-0.15em;margin-right:2px;">
+        Data Mixtures
       </a>
-      <a href="#" class="btn btn-outline">
-        <img src="assets/huggingface-icon.png" style="height:1em;vertical-align:-0.15em;margin-right:2px;"> Models
+
+      <a href="https://huggingface.co/PRISM-Midtraining/models" class="btn btn-outline">
+        <img src="assets/huggingface-icon.png" style="height:1.35em;vertical-align:-0.15em;margin-right:2px;">
+        Models
       </a>
+    
     </div>
+
 
     <div class="hero-figure">
       <img src="assets/web_fig.gif" alt="PRISM animated overview showing mid-training pipeline and results across model families" />
@@ -555,7 +569,7 @@
       </p>
       <br/>
       <p>
-        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +28 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Mechanistically, mid-training densely restructures &gt;90% of weights while RL makes sparse, front-loaded refinements to ~5% of parameters. Representational geometry is largely preserved through RL (CKA &gt;0.998 across models and input distributions), while different mid-training data mixtures produce same-magnitude but differently-directed weight updates (cosine similarity 0.52 for Granite-3.3, 0.62 for Nemotron-H). Pass rate landscape interpolation shows a generally increasing pass rate from Base (15%) to Mid-Training (72%) to RL (74-80%) for Granite-3.3, consistent with mid-training progressively improving the model's configuration for RL. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
+        Using targeted mid-training mixtures of only ~27B high-quality tokens, PRISM yields <strong>+15 to +40 point</strong> math gains, <strong>+5 to +12 point</strong> code gains, and <strong>+6 to +13 point</strong> science gains across all tested models, while preserving general-purpose performance. Crucially, data composition choices matter most at mid-training, not at RL: including science data during mid-training unlocks <strong>+17 to +28 point</strong> GPQA-Diamond gains during RL, while changing the RL mix produces less than 2 point differences. The full PRISM-to-RL pipeline transforms base models scoring under 12 AVG into models scoring <strong>29-42 AVG</strong>, a 3-4x improvement. Mechanistically, mid-training densely restructures &gt;90% of weights while RL makes sparse, front-loaded refinements to ~5% of parameters. Representational geometry is largely preserved through RL (CKA &gt;0.998 across models and input distributions), while different mid-training data mixtures produce same-magnitude but differently-directed weight updates (cosine similarity 0.52 for Granite-3.3, 0.62 for Nemotron-H). Pass rate landscape interpolation shows a generally increasing pass rate from Base (17%) to Mid-Training (76%) to RL (80%) for Granite-3.3, consistent with mid-training progressively improving the model's configuration for RL. Benefits hold for both dense Transformers and attention-Mamba hybrids, from 3B to 24B parameters.
       </p>
     </div>
   </section>
@@ -610,8 +624,8 @@
       </div>
       <div class="finding-card">
         <div class="finding-num">Finding 6</div>
-        <h3>Mid-training is the key RL prerequisite, confirmed geometrically</h3>
-        <p>CKA analysis shows RL preserves mid-training representations (CKA <span class="finding-highlight">&gt;0.998</span>). Pass rate landscape on held-out MATH500 shows a generally increasing path from Base (<span class="finding-highlight">15%</span>) to MT (<span class="finding-highlight">72%</span>) to RL (<span class="finding-highlight">74-80%</span>) for Granite-3.3, consistent with mid-training improving the configuration for RL.</p>
+        <h3>Mid-training and RL operate at different representational scales, confirmed mechanistically</h3>
+        <p>CKA analysis shows RL preserves mid-training representations (CKA <span class="finding-highlight">&gt;0.998</span>). Pass rate landscape on held-out MATH500 shows a generally increasing path from Base (<span class="finding-highlight">17%</span>) to MT (<span class="finding-highlight">76%</span>) to RL (<span class="finding-highlight">80%</span>) for Granite-3.3, consistent with mid-training improving the model's configuration for subsequent RL.</p>
       </div>
     </div>
   </section>
@@ -947,17 +961,17 @@
           Figure: CKA analysis (PDF format, view in paper)
         </div>
         <div class="fig-caption">
-          <strong>CKA similarity between mid-trained and RL checkpoints</strong> on Wikipedia, C4, and GSM8K inputs for Granite-3.3, LLaMA-3.1, Granite-4H, and Nemotron-H. RL consistently preserves the representational geometry established by mid-training (CKA &gt;0.998 for G33, LLaMA, G4H). Nemotron-H shows architecture-specific effects in early Mamba layers (CKA ~0.1 on general text), yet perplexity is unchanged (11.49 vs 11.52), indicating a layer-type-specific reorganization without functional degradation.
+          <strong>CKA similarity between mid-trained and RL checkpoints</strong> on Wikipedia, C4, and GSM8K inputs for Granite-3.3, LLaMA-3.1, Granite-4H, and Nemotron-H (200 samples, batch-size 1). RL consistently preserves the representational geometry established by mid-training across <em>all four models</em> and all three input distributions (minimum MT vs RL CKA &gt;0.998). Bootstrap confidence intervals (20 resamples) confirm the estimates are stable (std &lt;0.0001).
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:860px; margin:0 auto;">
         <div style="background:#f8f9fc; border-radius:10px; padding:18px; border:1px solid var(--c-border);">
-          <div style="font-size:0.78rem; font-weight:700; color:var(--c-accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Dense Transformers (G33, LLaMA, G4H)</div>
-          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">CKA &gt;0.999 across all layers and all three input distributions (Wikipedia, C4, GSM8K). Mid-training's representational geometry is fully preserved through RL regardless of data domain.</div>
+          <div style="font-size:0.78rem; font-weight:700; color:var(--c-accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Dense Transformers (G33, LLaMA)</div>
+          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">CKA &gt;0.999 across all layers and all three input distributions. Mid-training's representational geometry is fully preserved through RL regardless of input domain.</div>
         </div>
         <div style="background:#f8f9fc; border-radius:10px; padding:18px; border:1px solid var(--c-border);">
-          <div style="font-size:0.78rem; font-weight:700; color:#7C3AED; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Attention-Mamba Hybrid (Nemotron-H)</div>
-          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">Early Mamba layers (7-16) show low CKA (~0.1) on general text after RL, but perplexity is unchanged. This architecture-specific reorganization does not occur in the Granite-4H hybrid, pointing to model-specific RL dynamics.</div>
+          <div style="font-size:0.78rem; font-weight:700; color:#7C3AED; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Hybrid Architectures (G4H, Nemotron-H)</div>
+          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">Same universal finding: CKA &gt;0.998 across all layers and all three input distributions for both Granite-4H and Nemotron-H. The finding holds for dense and hybrid attention-Mamba architectures alike.</div>
         </div>
       </div>
     </div>
