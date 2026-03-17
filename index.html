@@ -946,7 +946,7 @@
       </div>
 
       <div style="margin-top:16px; font-size:0.82rem; color:var(--c-text-secondary); text-align:center; line-height:1.6;">
-        RL produces <strong>identical weight changes</strong> whether or not mid-training preceded it, yet only succeeds when applied to mid-trained models.
+        RL produces <strong>similarly scaled and sparse</strong> weight changes regardless of starting point, yet downstream performance differs substantially depending on whether mid-training preceded it.
       </div>
     </div>
 
@@ -961,17 +961,17 @@
           Figure: CKA analysis (PDF format, view in paper)
         </div>
         <div class="fig-caption">
-          <strong>CKA similarity between mid-trained and RL checkpoints</strong> on Wikipedia, C4, and GSM8K inputs for Granite-3.3, LLaMA-3.1, Granite-4H, and Nemotron-H (200 samples, batch-size 1). RL consistently preserves the representational geometry established by mid-training across <em>all four models</em> and all three input distributions (minimum MT vs RL CKA &gt;0.998). Bootstrap confidence intervals (20 resamples) confirm the estimates are stable (std &lt;0.0001).
+          <strong>CKA similarity between mid-trained and RL checkpoints</strong> on Wikipedia, C4, and GSM8K inputs for Granite-3.3, LLaMA-3.1, and Nemotron-H (200 samples, batch-size 1). RL consistently preserves the representational geometry established by mid-training across <em>all three models</em> and all three input distributions (minimum MT vs RL CKA &gt;0.998). Bootstrap confidence intervals (20 resamples) confirm the estimates are stable (std &lt;0.0001).
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:860px; margin:0 auto;">
         <div style="background:#f8f9fc; border-radius:10px; padding:18px; border:1px solid var(--c-border);">
           <div style="font-size:0.78rem; font-weight:700; color:var(--c-accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Dense Transformers (G33, LLaMA)</div>
-          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">CKA &gt;0.999 across all layers and all three input distributions. Mid-training's representational geometry is fully preserved through RL regardless of input domain.</div>
+          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">CKA &gt;0.999 across all layers and all three input distributions. Mid-training's representational geometry is consistently preserved through RL across input domains (CKA &gt;0.999 for dense Transformers; &gt;0.998 for hybrids).</div>
         </div>
         <div style="background:#f8f9fc; border-radius:10px; padding:18px; border:1px solid var(--c-border);">
-          <div style="font-size:0.78rem; font-weight:700; color:#7C3AED; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Hybrid Architectures (G4H, Nemotron-H)</div>
-          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">Same universal finding: CKA &gt;0.998 across all layers and all three input distributions for both Granite-4H and Nemotron-H. The finding holds for dense and hybrid attention-Mamba architectures alike.</div>
+          <div style="font-size:0.78rem; font-weight:700; color:#7C3AED; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Hybrid Architecture (Nemotron-H)</div>
+          <div style="font-size:0.88rem; color:var(--c-text-secondary); line-height:1.6;">MT vs RL CKA &gt;0.998 across all layers and all three input distributions for Nemotron-H. Note: Nemotron-H shows broader Base vs MT divergence in later layers (CKA &sim;0.41 on GSM8K at layer 48), indicating mid-training restructures hybrid models more extensively.</div>
         </div>
       </div>
     </div>
@@ -979,7 +979,7 @@
     <!-- Weight Direction Analysis -->
     <div class="weight-compare" style="margin-top:32px;">
       <h3>Weight Direction Analysis: Same Magnitude, Different Direction</h3>
-      <p class="wc-subtitle">MC and MCS mid-training produce identical weight change magnitudes but different directions, explaining why data composition decisions at mid-training determine RL outcomes.</p>
+      <p class="wc-subtitle">MC and MCS mid-training produce nearly identical weight change magnitudes but different directions, suggesting that data composition at mid-training shapes the weight configuration that RL subsequently refines.</p>
       <div class="figure-card" style="max-width:860px; margin:0 auto 20px;">
         <img src="assets/weight_direction_paper.jpg" alt="Weight direction analysis comparing MC and MCS mid-training" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
         <div style="display:none; padding:60px 20px; text-align:center; color:var(--c-text-secondary); font-size:0.9rem; background:#f8f9fc;">
@@ -1145,7 +1145,7 @@
           <i class="fas fa-arrows-alt"></i>
         </div>
         <h3>Data composition changes direction, not magnitude</h3>
-        <p>MC and MCS mid-training produce <strong>identical weight changes</strong> (L2: 0.177 vs 0.175), yet MCS+RL achieves GPQA-Diamond of 52.9 vs only 35.5 for MC+RL. Cosine similarity between the two update directions is only 0.52 (G33) and 0.62 (Nemotron-H).</p>
+        <p>MC and MCS mid-training produce <strong>nearly identical weight change magnitudes</strong> (L2: 0.177 vs 0.175), yet MCS+RL achieves GPQA-Diamond of 52.9 vs only 35.5 for MC+RL. Cosine similarity between the two update directions is only 0.52 (G33) and 0.62 (Nemotron-H).</p>
       </div>
       <div class="analysis-card">
         <div class="ac-icon" style="background: linear-gradient(135deg, #7C3AED, #8B5CF6);">
@@ -1159,14 +1159,14 @@
           <i class="fas fa-bolt"></i>
         </div>
         <h3>RL optimization is front-loaded</h3>
-        <p>Most weight changes occur in the first <strong>~200-400 steps</strong>, then plateau. The active parameter set grows progressively from ~1.5% to ~5%, and MT vs Base starting points produce identical trajectories.</p>
+        <p>Most weight changes occur in the first <strong>~200-400 steps</strong>, then plateau. The active parameter set grows progressively from ~1.5% to ~5%, and MT vs Base starting points produce similarly scaled and sparse update trajectories.</p>
       </div>
       <div class="analysis-card">
         <div class="ac-icon" style="background: linear-gradient(135deg, #0EA5E9, #38BDF8);">
           <i class="fas fa-project-diagram"></i>
         </div>
         <h3>RL preserves representational geometry</h3>
-        <p>CKA similarity between mid-trained and RL representations exceeds <strong>0.998</strong> across all layers for Granite-3.3, LLaMA, and Granite-4H on Wikipedia, C4, and GSM8K inputs. RL refines rather than restructures the learned representations.</p>
+        <p>CKA similarity between mid-trained and RL representations exceeds <strong>0.998</strong> across all three models (Granite-3.3, LLaMA-3.1, Nemotron-H) on Wikipedia, C4, and GSM8K inputs. RL consistently refines rather than restructures the learned representations.</p>
       </div>
       <div class="analysis-card">
         <div class="ac-icon" style="background: linear-gradient(135deg, #DB2777, #EC4899);">
